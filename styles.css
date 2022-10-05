@@ -1,3 +1,8 @@
+body {
+    display: flex;
+    flex-direction: column;
+}
+
 .border {
     background-color: gray;
     margin: 80px auto;
@@ -35,4 +40,9 @@
     margin: 24px auto;
     width: fit-content;
     font-size: 2rem;
+}
+
+button {
+    margin: 24px auto;
+    width: 3rem;
 }

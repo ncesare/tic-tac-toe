@@ -1,5 +1,6 @@
 const squares = document.querySelectorAll('.container div');
 const winnerDisplay = document.querySelector('.winner');
+const resetButton = document.querySelector('button');
 
 const protoPlayer = function(isHuman, marker) {
     let isTurn = false;
@@ -119,7 +120,7 @@ const gameBoard = (() => {
         // Optimize the function in the event listener
         square.addEventListener('click', () => {
             if (gameOn) {
-                square.textContent = squareObject.status = squareObject.updateStatus();
+                if (square.textContent !== 'O') square.textContent = squareObject.status = squareObject.updateStatus(); // Quick patch fix. Needs better logic.
                 checkWin();
                 changePlayers();
                 if (currentPlayer.isHuman === false) {
@@ -128,6 +129,19 @@ const gameBoard = (() => {
                 }
                 checkWin();
             }
-        }, {once: true});
+        }, {once: false});
     });
+
+    resetButton.addEventListener('click', () => resetBoard());
+    const resetBoard = function() {
+        gameOn = true;
+        for (square of squares) {
+            square.textContent = '';
+        }
+        for (squareObject of squareArray) {
+            squareObject.status = '';
+        }
+        winnerDisplay.textContent = '';
+        return;
+    }
 })();
