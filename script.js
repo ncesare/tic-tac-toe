@@ -33,6 +33,14 @@ const gameBoard = (() => {
     let x = 0;
     let y = 0;
 
+    const checkDraw = function() {
+        for (square of squareArray) {
+            if (square.status === '') return;
+        }
+        gameOn = false;
+        return winnerDisplay.textContent = 'Draw'
+    }
+
     const checkWin = function() {
         // Iterate over squares on the board and check win conditions according to starting square and direction.
 
@@ -81,7 +89,7 @@ const gameBoard = (() => {
     }
 
     const gameAI = function() {
-        let computerPlayer = players.find(player => !player.isHuman)
+        if (!gameOn) return;
         const randInt = Math.floor(Math.random() * 9);
         const selection = squares[randInt];
         const selectionObject = squareArray[randInt];
@@ -101,12 +109,15 @@ const gameBoard = (() => {
         square.addEventListener('click', () => {
             if (gameOn) {
                 square.textContent = squareObject.status = squareObject.updateStatus();
+                checkWin();
+                checkDraw();
                 changePlayers();
                 if (currentPlayer.isHuman === false) {
                     gameAI();
                     changePlayers();
                 }
                 checkWin();
+                checkDraw();
             }
         }, {once: true});
     });
