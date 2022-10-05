@@ -30,6 +30,11 @@ const gameBoard = (() => {
 
     let squareArray = [];
 
+    // Assign squares coordinates on a grid, starting at 0
+    // 0, 0 | 1, 0 | 2, 0
+    // 1, 0 | 1, 1 | 2, 1
+    // 2, 0 | 1, 2 | 2, 2
+
     let x = 0;
     let y = 0;
 
@@ -90,6 +95,8 @@ const gameBoard = (() => {
         else currentPlayer = players.find(player => player.marker === 'X');
     }
 
+
+    // Can the AI be its own object with methods for minmax selection, random selection, and placing markers?
     const gameAI = function() {
         if (!gameOn) return;
         const randInt = Math.floor(Math.random() * 9);
@@ -108,6 +115,8 @@ const gameBoard = (() => {
             y++;
         }
 
+
+        // Optimize the function in the event listener
         square.addEventListener('click', () => {
             if (gameOn) {
                 square.textContent = squareObject.status = squareObject.updateStatus();
