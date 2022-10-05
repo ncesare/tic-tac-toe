@@ -16,14 +16,18 @@ const players = [player1, player2];
 let currentPlayer = players.find(player => player.isTurn === true);
 
 const createSquare = function(square, x, y) {
-    let status = '';
+    this.status = '';
 
+    // Can we include the DOM element in the square object? So they change together automatically.
     const updateStatus = function() {
         console.log(x, y)
-        if (square.textContent === '') return currentPlayer.marker;
+        if (square.textContent === '') {
+            this.status = currentPlayer.marker;
+            return currentPlayer.marker;
+        }
     }
 
-    return {x, y, status, updateStatus};
+    return {x, y, status: this.status, updateStatus};
 }
 
 const gameBoard = (() => {
@@ -40,7 +44,7 @@ const gameBoard = (() => {
     let y = 0;
 
     const checkDraw = function() {
-        for (square of squareArray) {
+        for (let square of squareArray) {
             if (square.status === '') return;
         }
         gameOn = false;
@@ -50,11 +54,11 @@ const gameBoard = (() => {
     const checkWin = function() {
         // Iterate over squares on the board and check win conditions according to starting square and direction.
 
-        for (square of squareArray) {
+        for (let square of squareArray) {
             if (square.status === '') continue;
-            else if (square.x === 0 && checkRow() || 
-                    square.y === 0 && checkColumn() || 
-                    checkDiagonal()) {
+            else if (square.x === 0 && checkRow(square) || 
+                    square.y === 0 && checkColumn(square) || 
+                    checkDiagonal(square)) {
                         gameOn = false;
                         return winnerDisplay.textContent = `${square.status} wins`;
                     }
@@ -62,21 +66,21 @@ const gameBoard = (() => {
         // If no win is returned, check for draw.
         checkDraw();
 
-        function checkRow() {
+        function checkRow(square) {
             const square2 = squareArray.find(element => element.x === square.x + 1 && element.y === square.y);
             const square3 = squareArray.find(element => element.x === square.x + 2 && element.y === square.y);
 
             if (square.status === square2.status && square.status === square3.status) return true;
         }
 
-        function checkColumn() {
+        function checkColumn(square) {
             const square2 = squareArray.find(element => element.y === square.y + 1 && element.x === square.x);
             const square3 = squareArray.find(element => element.y === square.y + 2 && element.x === square.x);
 
             if (square.status === square2.status && square.status === square3.status) return true;
         }
 
-        function checkDiagonal() {
+        function checkDiagonal(square) {
             const square2 = squareArray.find(element => element.x === 1 && element.y === 1);
             let square3 = squareArray.find(element => element.x === 2 && element.y === 2);
 
@@ -103,9 +107,13 @@ const gameBoard = (() => {
         const randInt = Math.floor(Math.random() * 9);
         const selection = squares[randInt];
         const selectionObject = squareArray[randInt];
-        if (selection.textContent === '') return selection.textContent = selectionObject.status = selectionObject.updateStatus();
+        if (selection.textContent === '') return paintSquare(selectionObject.updateStatus(), selection);
         else return gameAI();
     }    
+
+    const paintSquare = function(marker, square) {
+        return square.textContent = marker;
+    }
 
     squares.forEach(square => {
         const squareObject = createSquare(square, x, y);
@@ -118,9 +126,12 @@ const gameBoard = (() => {
 
 
         // Optimize the function in the event listener
+        // Plan — set {once: true} and create a function to fill-in squares.
+        // Reset button will reapply that function to each button.
+        // Fill-in function will only let you fill in empty squares. Clicking on filled square has no effect.
         square.addEventListener('click', () => {
             if (gameOn) {
-                if (square.textContent !== 'O') square.textContent = squareObject.status = squareObject.updateStatus(); // Quick patch fix. Needs better logic.
+                if (square.textContent !== 'O') paintSquare(squareObject.updateStatus(), square); // Quick patch fix. Needs better logic.
                 checkWin();
                 changePlayers();
                 if (currentPlayer.isHuman === false) {
@@ -135,10 +146,10 @@ const gameBoard = (() => {
     resetButton.addEventListener('click', () => resetBoard());
     const resetBoard = function() {
         gameOn = true;
-        for (square of squares) {
+        for (let square of squares) {
             square.textContent = '';
         }
-        for (squareObject of squareArray) {
+        for (let squareObject of squareArray) {
             squareObject.status = '';
         }
         winnerDisplay.textContent = '';
