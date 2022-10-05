@@ -30,3 +30,9 @@
                   user-select: none; /* Non-prefixed version, currently
                                         supported by Chrome, Edge, Opera and Firefox */
 }
+
+.winner {
+    margin: 24px auto;
+    width: fit-content;
+    font-size: 2rem;
+}
