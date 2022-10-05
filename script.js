@@ -53,6 +53,8 @@ const gameBoard = (() => {
                         return winnerDisplay.textContent = `${square.status} wins`;
                     }
         }
+        // If no win is returned, check for draw.
+        checkDraw();
 
         function checkRow() {
             const square2 = squareArray.find(element => element.x === square.x + 1 && element.y === square.y);
@@ -110,14 +112,12 @@ const gameBoard = (() => {
             if (gameOn) {
                 square.textContent = squareObject.status = squareObject.updateStatus();
                 checkWin();
-                checkDraw();
                 changePlayers();
                 if (currentPlayer.isHuman === false) {
                     gameAI();
                     changePlayers();
                 }
                 checkWin();
-                checkDraw();
             }
         }, {once: true});
     });
