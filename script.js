@@ -18,10 +18,9 @@ let currentPlayer = players.find(player => player.isTurn === true);
 const createSquare = function(square, x, y) {
     let status = '';
 
-    const updateStatus =  function() {
+    const updateStatus = function() {
         console.log(x, y)
         if (square.textContent === '') return currentPlayer.marker;
-        else return '';
     }
 
     return {x, y, status, updateStatus};
@@ -42,7 +41,8 @@ const gameBoard = (() => {
             if (square.status === '') continue;
             else if (square.x === 0 && checkRow() || 
                     square.y === 0 && checkColumn() || 
-                    square.x === 0 && square.y === 0 && checkDiagonal()) {
+                    square.x === 0 && square.y === 0 && checkDiagonal() ||
+                    square.x === 2 && square.y === 0 && checkDiagonal()) {
                         gameOn = false;
                         return winnerDisplay.textContent = `${square.status} wins`;
                     }
@@ -64,8 +64,11 @@ const gameBoard = (() => {
 
         function checkDiagonal() {
             const square2 = squareArray.find(element => element.x === 1 && element.y === 1);
-            const square3 = squareArray.find(element => element.x === 2 && element.y === 2);
+            let square3 = squareArray.find(element => element.x === 2 && element.y === 2);
 
+            if (square.status === square2.status && square.status === square3.status) return true;
+
+            square3 = squareArray.find(element => element.x === 0 && element.y === 2);
             if (square.status === square2.status && square.status === square3.status) return true;
         }
     }
@@ -88,7 +91,8 @@ const gameBoard = (() => {
             if (gameOn) {
                 square.textContent = squareObject.status = squareObject.updateStatus();
                 changePlayers();
+                checkWin();
             }
-        });
+        }, {once: true});
 });
 })();
