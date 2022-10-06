@@ -1,4 +1,4 @@
-const squares = document.querySelectorAll('.container div');
+let squares = document.querySelectorAll('.container div');
 const winnerDisplay = document.querySelector('.winner');
 const resetButton = document.querySelector('button');
 
@@ -15,33 +15,24 @@ const player2 = protoPlayer(false, 'O');
 const players = [player1, player2];
 let currentPlayer = players.find(player => player.isTurn === true);
 
-const createSquare = function(square, x, y) {
+const createSquare = function(div, x, y) {
     this.status = '';
-
     // Can we include the DOM element in the square object? So they change together automatically.
     const updateStatus = function() {
         console.log(x, y)
-        if (square.textContent === '') {
+        if (this.div.textContent === '') {
             this.status = currentPlayer.marker;
             return currentPlayer.marker;
         }
     }
 
-    return {x, y, status: this.status, updateStatus};
+    return {x, y, status: this.status, updateStatus, div};
 }
 
 const gameBoard = (() => {
     let gameOn = true;
 
     let squareArray = [];
-
-    // Assign squares coordinates on a grid, starting at 0
-    // 0, 0 | 1, 0 | 2, 0
-    // 1, 0 | 1, 1 | 2, 1
-    // 2, 0 | 1, 2 | 2, 2
-
-    let x = 0;
-    let y = 0;
 
     const checkDraw = function() {
         for (let square of squareArray) {
@@ -105,33 +96,19 @@ const gameBoard = (() => {
     const gameAI = function() {
         if (!gameOn) return;
         const randInt = Math.floor(Math.random() * 9);
-        const selection = squares[randInt];
-        const selectionObject = squareArray[randInt];
-        if (selection.textContent === '') return paintSquare(selectionObject.updateStatus(), selection);
+        const selection = squareArray[randInt];
+        if (selection.div.textContent === '') return paintSquare(selection.updateStatus(), selection);
         else return gameAI();
     }    
 
     const paintSquare = function(marker, square) {
-        return square.textContent = marker;
+        return square.div.textContent = marker;
     }
 
-    squares.forEach(square => {
-        const squareObject = createSquare(square, x, y);
-        squareArray.push(squareObject);
-        if (x < 2) x++
-        else {
-            x = 0;
-            y++;
-        }
-
-
-        // Optimize the function in the event listener
-        // Plan — set {once: true} and create a function to fill-in squares.
-        // Reset button will reapply that function to each button.
-        // Fill-in function will only let you fill in empty squares. Clicking on filled square has no effect.
-        square.addEventListener('click', () => {
+    const onClickSquare = function(square) {
+        square.div.addEventListener('click', () => {
             if (gameOn) {
-                if (square.textContent !== 'O') paintSquare(squareObject.updateStatus(), square); // Quick patch fix. Needs better logic.
+                if (square.div.textContent !== 'O') paintSquare(square.updateStatus(), square); // Quick patch fix. Needs better logic.
                 checkWin();
                 changePlayers();
                 if (currentPlayer.isHuman === false) {
@@ -140,18 +117,40 @@ const gameBoard = (() => {
                 }
                 checkWin();
             }
-        }, {once: false});
-    });
+        }, {once: true});
+    }
+    const populateSquareArray = function() {
+        // Assign squares coordinates on a grid, starting at 0
+        // 0, 0 | 1, 0 | 2, 0
+        // 1, 0 | 1, 1 | 2, 1
+        // 2, 0 | 1, 2 | 2, 2
+
+        let x = 0;
+        let y = 0;
+
+        squares.forEach(element => {
+            const square = createSquare(element, x, y);
+            squareArray.push(square);
+            if (x < 2) x++
+            else {
+                x = 0;
+                y++;
+            }
+            onClickSquare(square);
+        })
+    };
+    populateSquareArray();
 
     resetButton.addEventListener('click', () => resetBoard());
+
     const resetBoard = function() {
+        squares = [];
+        squareArray = [];
+        document.querySelector('.container').innerHTML = '';
+        for (let i = 0; i < 9; i++) document.querySelector('.container').append(document.createElement('div'));
+        squares = document.querySelectorAll('.container div');
+        populateSquareArray();
         gameOn = true;
-        for (let square of squares) {
-            square.textContent = '';
-        }
-        for (let squareObject of squareArray) {
-            squareObject.status = '';
-        }
         winnerDisplay.textContent = '';
         return;
     }
