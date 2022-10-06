@@ -10,7 +10,7 @@ const protoPlayer = function(isHuman, marker) {
 }
 
 const player1 = protoPlayer(true, 'X');
-const player2 = protoPlayer(true, 'O');
+const player2 = protoPlayer(false, 'O');
 
 const players = [player1, player2];
 let currentPlayer = players.find(player => player.isTurn === true);
