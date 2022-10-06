@@ -101,6 +101,17 @@ const gameBoard = (() => {
         else return gameAI();
     }    
 
+    const minimaxAI = function() {
+        // if firstTurn === true and my marker is 'X' place marker at 1, 1
+        const myMarker = players.find(player => player.isHuman === false).marker;
+        
+
+        // Import the same painting logic from randAI
+        if (selection.div.textContent === '') return paintSquare(selection.updateStatus(), selection)
+    }
+
+    // minimaxAI(); //For testing
+
     const paintSquare = function(marker, square) {
         return square.div.textContent = marker;
     }
@@ -108,7 +119,8 @@ const gameBoard = (() => {
     const onClickSquare = function(square) {
         square.div.addEventListener('click', () => {
             if (gameOn) {
-                if (square.div.textContent !== 'O') paintSquare(square.updateStatus(), square); // Quick patch fix. Needs better logic.
+                if (square.div.textContent !== '') return;
+                paintSquare(square.updateStatus(), square); // Quick patch fix. Needs better logic.
                 checkWin();
                 changePlayers();
                 if (currentPlayer.isHuman === false) {
